@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Models\EventNotifyChannel;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
@@ -15,17 +16,23 @@ class EventController extends Controller{
     public function index()
     {
         $events = Event::all(); 
-        // $eventA = new \stdClass();
-        // $eventA->name = 'Event A';
-        // $eventA->trigger_time = now();
 
-        // $eventB = new \stdClass();
-        // $eventB->name = 'Event B';
-        // $eventB->trigger_time = now();
+        $response = [];
+        foreach ($events as $event) {
+            $eventNotifyChannelIds = [];
+            foreach ($event->eventNotifyChannels as $eventNotifyChannel) {
+                $eventNotifyChannelIds[] = $eventNotifyChannel->notify_channels_id;
+            }
 
-        // $events = [$eventA, $eventB];
+            $response[] = [
+                'id' => $event->id,
+                'name' => $event->name,
+                'trigger_time' => $event->trigger_time,
+                'event_notify_channels' => $eventNotifyChannelIds,
+            ];
+        }
 
-        return response()->json($events);
+        return response()->json($response);
     }
     public function create(Request $request)
     {
@@ -47,38 +54,17 @@ class EventController extends Controller{
         $event->name = $request->name;
         $event->trigger_time = $request->trigger_time;
         $event->save();
-    
-    
-                      
-        // $eventA = new \stdClass();
-        // $eventA->name = 'Event A';
-        // $eventA->trigger_time = now();
-
-        // $eventB = new \stdClass();
-        // $eventB->name = 'Event B';
-        // $eventB->trigger_time = now();
-
-        // $events = [
-        //     '1' => $eventA,
-        //     '2' => $eventB
-        // ];
-
-        // if (isset($events[$id])) {
-        //     $updateEvent = $events[$id];
-        //     $updateEvent->name = $request->name;
-        //     $updateEvent->trigger_time = $request->trigger_time;
-        // }
 
         return response()->json($event);
     }
     public function show($id, Request $request)
     {
         try {
-            $event = Event::findOrFail($id);
+            $events = Event::findOrFail($id);
         } catch (ModelNotFoundException $th) {
             return response()->json(['message' => 'event not found'], 404);
         }
-        return response()->json($event);
+        return response()->json($events);
     }
     public function delete($id, Request $request)
     {

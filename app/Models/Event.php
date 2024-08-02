@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 use Illuminate\Database\Eloquent\Model;
 
 class Event extends Model
 {
-    use HasFactory;
+    public function eventNotifyChannels()
+    {
+        return $this->hasMany(EventNotifyChannel::class, 'id', 'id');
+    }
 }

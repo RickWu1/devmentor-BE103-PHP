@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->timestamps();
         });
+        Schema::rename('event_notify_channel', 'event_notify_channels');
     }
 
     /**
@@ -23,5 +24,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('event_notify_channel');
+
+        Schema::rename('event_notify_channels', 'event_notify_channel');
     }
 };
