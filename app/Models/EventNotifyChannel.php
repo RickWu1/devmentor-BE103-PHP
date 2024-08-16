@@ -9,4 +9,6 @@ class EventNotifyChannel extends Model
 {
     
     protected $table = 'event_notify_channel';
+    public $timestamps = false;
+
 }

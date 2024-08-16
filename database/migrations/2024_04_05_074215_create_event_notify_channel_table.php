@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('event_notify_channel', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+            $table->bigInteger('event_id');
+            $table->bigInteger('notify_channel_id');
+            $table->text('message');
         });
-        Schema::rename('event_notify_channel', 'event_notify_channels');
     }
 
     /**
@@ -25,6 +25,5 @@ return new class extends Migration
     {
         Schema::dropIfExists('event_notify_channel');
 
-        Schema::rename('event_notify_channels', 'event_notify_channel');
     }
 };
