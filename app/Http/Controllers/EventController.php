@@ -97,11 +97,9 @@ class EventController extends Controller{
     }    
     public function delete($id, Request $request)
     {
-        try {
-            $event = Event::findOrFail($id);
-        } catch (ModelNotFoundException $th) {
-            return response()->json(['message' => 'event not found'], 404);
-        }
-        $event->delete();
+        $deleteEvent = Event::where('id', $id)->first();
+        $deleteEvent-> delete();
+
+        return response()->json($deleteEvent);
     }
 }
