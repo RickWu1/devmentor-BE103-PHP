@@ -7,6 +7,7 @@ use App\Models\EventNotifyChannel;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Carbon\Carbon;
+use App\Http\Transformer\GetEventsTransformer;
 
 class EventController extends Controller{
 
@@ -14,25 +15,10 @@ class EventController extends Controller{
     {
         return response()->json(['message' => 'Hello World from controller!']);
     }
-    public function index()
+    public function index(GetEventsTransformer $transformer)
     {
-        $events = Event::all(); 
-
-        $response = [];
-        foreach ($events as $event) {
-            $eventNotifyChannelIds = [];
-            foreach ($event->EventNotifyChannels as $eventNotifyChannel) {
-                $eventNotifyChannelIds[] = $eventNotifyChannel->notify_channel_id;
-            }
-
-            $response[] = [
-                'id' => $event->id,
-                'name' => $event->name,
-                'trigger_time' => $event->trigger_time,
-                'event_notify_channels' => $eventNotifyChannelIds,
-            ];
-        }
-
+        $events = Event::with('eventNotifyChannels')->get();
+        $response = $transformer->transform($events);
         return response()->json($response);
     }
     public function create(Request $request)
@@ -80,22 +66,14 @@ class EventController extends Controller{
     public function get($event_id)
     {
         $event = Event::find($event_id);
-
-        
-        $eventNotifyChannelIds = [];
-        foreach ($event->eventNotifyChannels as $eventNotifyChannel) {
-            $eventNotifyChannelIds[] = $eventNotifyChannel->notify_channel_id;
-        }
-
         $response = [
             'id' => $event->id,
             'name' => $event->name,
             'trigger_time' => $event->trigger_time,
-            'event_notify_channels' => $eventNotifyChannelIds,
+            'event_notify_channels' => $event->eventNotifyChannels->pluck('notify_channel_id'),
         ];
         return response()->json($response);
-    }    
-    public function delete($id, Request $request)
+    }        public function delete($id, Request $request)
     {
         $deleteEvent = Event::where('id', $id)->first();
         $deleteEvent-> delete();
