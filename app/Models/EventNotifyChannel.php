@@ -7,5 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class EventNotifyChannel extends Model
 {
-    use HasFactory;
+    
+    protected $table = 'event_notify_channel';
+    public $timestamps = false;
+
 }

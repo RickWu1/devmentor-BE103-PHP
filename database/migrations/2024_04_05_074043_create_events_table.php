@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('events', function (Blueprint $table) {
             $table->id();
             $table->char('name');
-            $table->timestamp('trigger_time');
+            $table->timestamp('trigger_time')->default(DB::raw('CURRENT_TIMESTAMP'));;
             $table->timestamps();
         });
     }

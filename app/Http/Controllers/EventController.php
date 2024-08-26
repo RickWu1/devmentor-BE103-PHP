@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Models\EventNotifyChannel;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Carbon\Carbon;
+use App\Http\Transformer\GetEventsTransformer;
 
 class EventController extends Controller{
 
@@ -12,81 +15,69 @@ class EventController extends Controller{
     {
         return response()->json(['message' => 'Hello World from controller!']);
     }
-    public function index()
+    public function index(GetEventsTransformer $transformer)
     {
-        $events = Event::all(); 
-        // $eventA = new \stdClass();
-        // $eventA->name = 'Event A';
-        // $eventA->trigger_time = now();
-
-        // $eventB = new \stdClass();
-        // $eventB->name = 'Event B';
-        // $eventB->trigger_time = now();
-
-        // $events = [$eventA, $eventB];
-
-        return response()->json($events);
+        $events = Event::with('eventNotifyChannels')->get();
+        $response = $transformer->transform($events);
+        return response()->json($response);
     }
     public function create(Request $request)
     {
         $event = new Event();
         $event->name = $request->name;
-        $event->trigger_time = $request->trigger_time;
+        $event->trigger_time = Carbon::parse($request->trigger_time);
         $event->save();
+
+        $eventNotifyChannels = [];
+        foreach ($request->event_notify_channels as $eventNotifyChannelId) {
+            $eventNotifyChannel = new EventNotifyChannel();
+            $eventNotifyChannel->notify_channel_id = $eventNotifyChannelId;
+            $eventNotifyChannel->message = 'test';
+            $eventNotifyChannels[] = $eventNotifyChannel;
+        }
+
+        $event->eventNotifyChannels()->saveMany($eventNotifyChannels);
+
 
         return response()->json($event);
     }
 
     public function update($id, Request $request)
     {
-        try {
-            $event = Event::findOrFail($id);
-        } catch (ModelNotFoundException $th) {
-            return response()->json(['message' => 'event not found'], 404);
+        $updateEvent = Event::where('id', $id)->first();
+        $updateEvent->name = $request->name;
+        $updateEvent->trigger_time = Carbon::parse($request->trigger_time);
+        $updateEvent->save();
+
+        $updateEvent->eventNotifyChannels()->delete();
+
+        $eventNotifyChannels = [];
+        foreach ($request->event_notify_channels as $eventNotifyChannelId) {
+            $eventNotifyChannel = new EventNotifyChannel();
+            $eventNotifyChannel->notify_channel_id = $eventNotifyChannelId;
+            $eventNotifyChannel->message = 'test';
+            $eventNotifyChannels[] = $eventNotifyChannel;
         }
-        $event->name = $request->name;
-        $event->trigger_time = $request->trigger_time;
-        $event->save();
-    
-    
-                      
-        // $eventA = new \stdClass();
-        // $eventA->name = 'Event A';
-        // $eventA->trigger_time = now();
 
-        // $eventB = new \stdClass();
-        // $eventB->name = 'Event B';
-        // $eventB->trigger_time = now();
+        $updateEvent->eventNotifyChannels()->saveMany($eventNotifyChannels);
 
-        // $events = [
-        //     '1' => $eventA,
-        //     '2' => $eventB
-        // ];
-
-        // if (isset($events[$id])) {
-        //     $updateEvent = $events[$id];
-        //     $updateEvent->name = $request->name;
-        //     $updateEvent->trigger_time = $request->trigger_time;
-        // }
-
-        return response()->json($event);
+        return response()->json($updateEvent);
     }
-    public function show($id, Request $request)
+    public function get($event_id)
     {
-        try {
-            $event = Event::findOrFail($id);
-        } catch (ModelNotFoundException $th) {
-            return response()->json(['message' => 'event not found'], 404);
-        }
-        return response()->json($event);
-    }
-    public function delete($id, Request $request)
+        $event = Event::find($event_id);
+        $response = [
+            'id' => $event->id,
+            'name' => $event->name,
+            'trigger_time' => $event->trigger_time,
+            'event_notify_channels' => $event->eventNotifyChannels->pluck('notify_channel_id'),
+        ];
+        return response()->json($response);
+    }        public function delete($id, Request $request)
     {
-        try {
-            $event = Event::findOrFail($id);
-        } catch (ModelNotFoundException $th) {
-            return response()->json(['message' => 'event not found'], 404);
-        }
-        $event->delete();
+        $deleteEvent = Event::where('id', $id)->first();
+        $deleteEvent-> delete();
+
+        return response()->json($deleteEvent);
     }
 }
