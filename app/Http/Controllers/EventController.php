@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Carbon\Carbon;
 use App\Http\Transformer\GetEventsTransformer;
+use App\Http\Requests\CreateEventRequest;
+use App\Http\Requests\UpdateEventRequest;
 
 class EventController extends Controller{
 
@@ -21,7 +23,7 @@ class EventController extends Controller{
         $response = $transformer->transform($events);
         return response()->json($response);
     }
-    public function create(Request $request)
+    public function create(CreateEventRequest $request)
     {
         $event = new Event();
         $event->name = $request->name;
@@ -42,15 +44,19 @@ class EventController extends Controller{
         return response()->json($event);
     }
 
-    public function update($id, Request $request)
+    public function update($id, UpdateEventRequest $request)
     {
-        $updateEvent = Event::where('id', $id)->first();
-        $updateEvent->name = $request->name;
+        $updateEvent = Event::where('id', $id)->firstOrFail();
+        if (null !== $request->name) {
+            $updateEvent->name = $request->name;
+        }
+        if (null !== $request->trigger_time) {
         $updateEvent->trigger_time = Carbon::parse($request->trigger_time);
+        }
         $updateEvent->save();
 
-        $updateEvent->eventNotifyChannels()->delete();
-
+        if (null !== $request->event_notify_channels) {
+            $updateEvent->eventNotifyChannels()->delete();
         $eventNotifyChannels = [];
         foreach ($request->event_notify_channels as $eventNotifyChannelId) {
             $eventNotifyChannel = new EventNotifyChannel();
@@ -60,7 +66,7 @@ class EventController extends Controller{
         }
 
         $updateEvent->eventNotifyChannels()->saveMany($eventNotifyChannels);
-
+    }
         return response()->json($updateEvent);
     }
     public function get($event_id)
@@ -73,7 +79,8 @@ class EventController extends Controller{
             'event_notify_channels' => $event->eventNotifyChannels->pluck('notify_channel_id'),
         ];
         return response()->json($response);
-    }        public function delete($id, Request $request)
+    }        
+    public function delete($id, Request $request)
     {
         $deleteEvent = Event::where('id', $id)->first();
         $deleteEvent-> delete();
