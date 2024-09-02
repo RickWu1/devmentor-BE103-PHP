@@ -12,7 +12,7 @@ class CreateEventRequest extends FormRequest
             'name' => 'required|string',
             'trigger_time' => 'required|date_format:Y-m-d H:i:s',
             'event_notify_channels' => 'required|array',
-            'event_notify_channels.*' => 'integer|exists:notify_channels,id',
+            'event_notify_channels.*' => 'integer|exists:notify_channels,id'
         ];
     } 
 

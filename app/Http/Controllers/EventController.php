@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use App\Http\Transformer\GetEventsTransformer;
 use App\Http\Requests\CreateEventRequest;
 use App\Http\Requests\UpdateEventRequest;
+use Illuminate\Support\Facades\DB;
 
 class EventController extends Controller{
 
@@ -24,7 +25,10 @@ class EventController extends Controller{
         return response()->json($response);
     }
     public function create(CreateEventRequest $request)
-    {
+{
+    DB::beginTransaction();
+
+    try {
         $event = new Event();
         $event->name = $request->name;
         $event->trigger_time = Carbon::parse($request->trigger_time);
@@ -39,36 +43,57 @@ class EventController extends Controller{
         }
 
         $event->eventNotifyChannels()->saveMany($eventNotifyChannels);
-
+        DB::commit();
 
         return response()->json($event);
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return response()->json(['error' => 'An error occurred while creating the event.'], 500);
     }
+}
 
-    public function update($id, UpdateEventRequest $request)
-    {
+public function update($id, UpdateEventRequest $request)
+{
+    DB::beginTransaction();
+
+    try {
         $updateEvent = Event::where('id', $id)->firstOrFail();
-        if (null !== $request->name) {
+
+        if ($request->has('name')) {
             $updateEvent->name = $request->name;
         }
-        if (null !== $request->trigger_time) {
-        $updateEvent->trigger_time = Carbon::parse($request->trigger_time);
+
+        if ($request->has('trigger_time')) {
+            $updateEvent->trigger_time = Carbon::parse($request->trigger_time);
         }
+
         $updateEvent->save();
 
-        if (null !== $request->event_notify_channels) {
+        if ($request->has('event_notify_channels')) {
             $updateEvent->eventNotifyChannels()->delete();
-        $eventNotifyChannels = [];
-        foreach ($request->event_notify_channels as $eventNotifyChannelId) {
-            $eventNotifyChannel = new EventNotifyChannel();
-            $eventNotifyChannel->notify_channel_id = $eventNotifyChannelId;
-            $eventNotifyChannel->message = 'test';
-            $eventNotifyChannels[] = $eventNotifyChannel;
+
+            $eventNotifyChannels = [];
+            foreach ($request->event_notify_channels as $eventNotifyChannelId) {
+                $eventNotifyChannel = new EventNotifyChannel();
+                $eventNotifyChannel->notify_channel_id = $eventNotifyChannelId;
+                $eventNotifyChannel->message = 'test';
+                $eventNotifyChannels[] = $eventNotifyChannel;
+            }
+
+            $updateEvent->eventNotifyChannels()->saveMany($eventNotifyChannels);
         }
 
-        $updateEvent->eventNotifyChannels()->saveMany($eventNotifyChannels);
-    }
+        DB::commit();
+
         return response()->json($updateEvent);
+    } catch (\Exception $e) {
+        DB::rollBack();
+
+        return response()->json(['error' => 'An error occurred while updating the event.'], 500);
     }
+}
+
+
     public function get($event_id)
     {
         $event = Event::find($event_id);

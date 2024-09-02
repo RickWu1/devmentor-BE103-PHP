@@ -21,7 +21,7 @@ class UpdateEventRequest extends FormRequest
             'name' => 'string',
             'trigger_time' => 'date_format:Y-m-d H:i:s',
             'event_notify_channels' => 'array',
-            'event_notify_channels.*' => 'integer|exists:notify_channels,id',
+            'event_notify_channels.*' => 'integer|exists:notify_channels,id'
         ];
     }
 }
