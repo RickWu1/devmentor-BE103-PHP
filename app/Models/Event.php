@@ -11,4 +11,8 @@ class Event extends Model
     {
         return $this->hasMany(EventNotifyChannel::class, 'event_id', 'id');
     }
+    public function userSubscribeEvents()
+    {
+        return $this->hasMany(UserSubscribeEvents::class, 'event_id');
+    }
 }
