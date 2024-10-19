@@ -2,10 +2,12 @@
 
 namespace App\Http\Repository;
 
-use Carbon\Carbon;
-use App\Models\EventNotifyChannel;
-use Illuminate\Support\Facades\DB;
 use App\Models\Event;
+use App\Models\EventNotifyChannel;
+use App\Models\User;
+use App\Models\UserSubscribeEvents;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class EventRepository
 {
@@ -37,6 +39,7 @@ class EventRepository
             return response()->json(['error' => 'An error occurred while updating the event.'], 500);
         }
     }
+
     public function update($id, array $input)
     {
         DB::beginTransaction();
@@ -54,11 +57,9 @@ class EventRepository
 
             $updateEvent->save();
 
-
             if (isset($input['event_notify_channels'])) {
 
                 $updateEvent->eventNotifyChannels()->delete();
-
 
                 $eventNotifyChannels = [];
                 foreach ($input['event_notify_channels'] as $eventNotifyChannelId) {
@@ -67,7 +68,6 @@ class EventRepository
                     $eventNotifyChannel->message = 'test';
                     $eventNotifyChannels[] = $eventNotifyChannel;
                 }
-
 
                 $updateEvent->eventNotifyChannels()->saveMany($eventNotifyChannels);
             }
@@ -82,6 +82,7 @@ class EventRepository
             return response()->json(['error' => 'An error occurred while updating the event.'], 500);
         }
     }
+
     public function get($event_id)
     {
         $event = Event::find($event_id);
@@ -93,6 +94,7 @@ class EventRepository
         ];
         return response()->json($response);
     }
+
     public function delete($id)
     {
         $deleteEvent = Event::where('id', $id)->first();
@@ -100,5 +102,39 @@ class EventRepository
 
         return response()->json($deleteEvent);
     }
-}
 
+    public function creatUser(array $input)
+    {
+        $userEvent = new User();
+        $userEvent->name = $input['name'];
+        $userEvent->email = $input['email'];
+        $userEvent->password = $input['password'];
+        $userEvent->save();
+
+        return response()->json($userEvent);
+    }
+
+    public function deleteUser($id)
+    {
+        $deleteUser = User::where('id', $id)->first();
+        $deleteUser->delete();
+
+        return response()->json($deleteUser);
+
+    }
+
+    public function subscribe($id, array $input)
+    {
+        $subscribeEvent = Event::where('id', $id)->firstOrFail();
+        $userSubscribeEvents = [];
+        foreach ($input['user_id'] as $userSubscribeEventsId) {
+            $userSubscribeEvent = new UserSubscribeEvents();
+            $userSubscribeEvent->event_id = $id;
+            $userSubscribeEvent->user_id = $userSubscribeEventsId;
+            $userSubscribeEvents[] = $userSubscribeEvent;
+        }
+
+        $subscribeEvent->UserSubscribeEvents()->saveMany($userSubscribeEvents);
+        return response()->json($userSubscribeEvents);
+    }
+}
