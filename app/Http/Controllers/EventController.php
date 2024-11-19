@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateEventRequest;
 use App\Http\Requests\UpdateEventRequest;
 use App\Http\Service\EventService;
 use App\Http\Transformer\GetEventsTransformer;
+use App\Jobs\SendEmail;
 use App\Models\Event;
 use Illuminate\Http\Request;
 
@@ -67,6 +69,12 @@ class EventController extends Controller
     {
         $event = $this->eventService->subscribe($id, $request->all());
         return response()->json($event);
+    }
 
+    public function testEmail($id, Request $request)
+    {
+        $job = new SendEmail();
+        $response = $job->handle($id);
+        echo $response;
     }
 }

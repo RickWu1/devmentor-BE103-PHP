@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\UserSubscribeEvents;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class EventRepository
 {
@@ -136,5 +137,12 @@ class EventRepository
 
         $subscribeEvent->UserSubscribeEvents()->saveMany($userSubscribeEvents);
         return response()->json($userSubscribeEvents);
+    }
+
+    public function sentMail($id, array $input)
+    {
+        $user = User::where('id', $id)->firstOrFail();
+        $useremail = $user['email'];
+        Mail::to($useremail)->send(new TestEmail($order));
     }
 }

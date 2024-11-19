@@ -30,3 +30,4 @@ Route::delete('/events/{id}', [EventController::class, 'delete']);
 Route::post('/events/user', [EventController::class, 'creatUser']);
 Route::delete('/events/user/{id}', [EventController::class, 'deleteUser']);
 Route::post('/events/subscribe/{eventId}', [EventController::class, 'subscribe']);
+Route::post('/events/emails/{id}', [EventController::class, 'testEmail']);
