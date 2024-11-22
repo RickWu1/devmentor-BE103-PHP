@@ -42,6 +42,6 @@ class SendEmail implements ShouldQueue
         }
 
         Mail::to($email)->send(new EventMail($users, $eventIds));
-        echo implode(', ', $eventIds);
+        echo "發送成功";
     }
 }
