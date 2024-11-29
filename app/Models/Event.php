@@ -13,6 +13,7 @@ class Event extends Model
 
     public function userSubscribeEvents()
     {
-        return $this->hasMany(UserSubscribeEvents::class, 'event_id');
+        return $this->hasMany(UserSubscribeEvents::class, 'event_id', 'id')->with('user');
+
     }
 }

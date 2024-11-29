@@ -9,5 +9,9 @@ class users extends Model
 
     protected $table = 'users';
     public $timestamps = false;
+    public function UserSubscribe()
+    {
+        return $this->hasMany(UserSubscribeEvents::class, 'user_id', 'id');
+    }
 
 }

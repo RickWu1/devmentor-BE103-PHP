@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
@@ -11,18 +10,23 @@ class TelegramNotification extends Notification
 {
     use Queueable;
 
+    protected $user;
+    protected $event;
+
     /**
-     * Create a new notification instance.
+     * 构造函数.
+     *
+     * @param $user 用户对象
+     * @param $event 事件对象
      */
-    public function __construct()
+    public function __construct($user, $event)
     {
-        //
+        $this->user  = $user;
+        $this->event = $event;
     }
 
     /**
-     * Get the notification's delivery channels.
-     *
-     * @return array<int, string>
+     * 指定通知的发送通道.
      */
     public function via(object $notifiable): array
     {
@@ -30,28 +34,27 @@ class TelegramNotification extends Notification
     }
 
     /**
-     * Get the mail representation of the notification.
+     * 构建 Telegram 消息.
      */
     public function toTelegram($notifiable)
     {
-        $url = 'www.google.com';
+        $message = "您好 {$this->user->name}，以下是事件详情：\n"
+            . "事件名称：{$this->event->name}\n"
+            . "触发时间：{$this->event->trigger_time}\n"
+            . "描述：{$this->event->description}";
 
         return TelegramMessage::create()
-        // ->content('这是一个通过 Telegram 推送的测试通知！')
-            ->content("这是一个通过 Telegram 推送的测试通知！, Hi Jimmy !!!")
-            ->button("View Invoice", $url)
-            ->button('Download Invoice', $url);
+            ->content($message);
     }
 
     /**
-     * Get the array representation of the notification.
-     *
-     * @return array<string, mixed>
+     * 将通知转为数组表示 (可选).
      */
     public function toArray(object $notifiable): array
     {
         return [
-            //
+            'user_id'  => $this->user->id,
+            'event_id' => $this->event->id,
         ];
     }
 }

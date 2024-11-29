@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
@@ -7,10 +6,13 @@ use App\Http\Requests\CreateEventRequest;
 use App\Http\Requests\UpdateEventRequest;
 use App\Http\Service\EventService;
 use App\Http\Transformer\GetEventsTransformer;
+use App\Jobs\sendDiscord;
 use App\Jobs\SendEmail;
 use App\Jobs\SendTelegram;
 use App\Models\Event;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class EventController extends Controller
 {
@@ -24,7 +26,7 @@ class EventController extends Controller
 
     public function index(GetEventsTransformer $transformer)
     {
-        $events = Event::with('eventNotifyChannels')->get();
+        $events   = Event::with('eventNotifyChannels')->get();
         $response = $transformer->transform($events);
         return response()->json($response);
     }
@@ -72,18 +74,79 @@ class EventController extends Controller
         return response()->json($event);
     }
 
-    public function testEmail($id, Request $request)
+    public function testEmail($id)
     {
-        $job = new SendEmail();
+        $job      = new SendEmail();
         $response = $job->handle($id);
         echo $response;
     }
 
-    public function sendTelegramNotification()
+    public function sendTelegramNotification($user, $event)
     {
-        $job = new SendTelegram();
+        $job      = new SendTelegram($user, $event);
+        $response = $job->handle();
+        Log::info("Telegram 通知发送成功：{$response}");
+        echo $response;
+    }
+
+    public function sendDiscordNotification($user, $event): void
+    {
+        $job      = new sendDiscord($user, $event);
         $response = $job->handle();
         echo $response;
+    }
+
+    public function testEventDispatch()
+    {
+        $events = Event::with([
+            'eventNotifyChannels.notifyChannel',
+            'userSubscribeEvents.user',
+        ])->where('trigger_time', '<', Carbon::now())->get();
+
+        foreach ($events as $event) {
+            $this->processEventNotifications($event);
+        }
+        Log::info('所有通知已处理完成');
+        return response()->json(['message' => '所有通知已处理完成'], 200);
+
+    }
+
+    protected function processEventNotifications($event)
+    {
+        foreach ($event->eventNotifyChannels as $channel) {
+            $channelName = $channel->notifyChannel->name;
+
+            foreach ($event->userSubscribeEvents as $subscription) {
+                $user = $subscription->user;
+
+                try {
+                    $this->sendNotification($channelName, $user, $event);
+                } catch (\Exception $e) {
+                    Log::error("通知失败: 事件 ID: {$event->id}, 用户 ID: {$user->id}");
+                }
+
+            }
+        }
+    }
+    private function sendNotification($channelName, $user, $event)
+    {
+        switch ($channelName) {
+            case 'email':
+                $this->testEmail($user->id, $event);
+                break;
+
+            case 'line':
+                $this->sendDiscordNotification($user, $event);
+                break;
+
+            case 'telegram':
+                $this->sendTelegramNotification($user, $event);
+                break;
+
+            default:
+                $this->error("未知的通知方式: $channelName");
+                break;
+        }
     }
 
 }

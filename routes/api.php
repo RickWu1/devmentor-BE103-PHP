@@ -22,13 +22,18 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::get('/hello', [EventController::class, 'hello']);
 
-Route::get('/events', [EventController::class, 'index']);
-Route::get('/events/{eventId}', [EventController::class, 'get']);
-Route::post('/events', [EventController::class, 'create']);
-Route::put('/events/{id}', [EventController::class, 'update']);
-Route::delete('/events/{id}', [EventController::class, 'delete']);
-Route::post('/events/user', [EventController::class, 'creatUser']);
-Route::delete('/events/user/{id}', [EventController::class, 'deleteUser']);
-Route::post('/events/subscribe/{eventId}', [EventController::class, 'subscribe']);
-Route::post('/events/emails/{id}', [EventController::class, 'testEmail']);
+Route::prefix('events')->group(function () {
+    Route::get('/', [EventController::class, 'index']);
+    Route::get('{eventId}', [EventController::class, 'get']);
+    Route::post('/', [EventController::class, 'create']);
+    Route::put('{id}', [EventController::class, 'update']);
+    Route::delete('{id}', [EventController::class, 'delete']);
+    Route::post('user', [EventController::class, 'creatUser']);
+    Route::delete('user/{id}', [EventController::class, 'deleteUser']);
+    Route::post('subscribe/{eventId}', [EventController::class, 'subscribe']);
+    Route::post('emails/{id}', [EventController::class, 'testEmail']);
+});
+
 Route::get('/send-telegram', [EventController::class, 'sendTelegramNotification']);
+Route::get('/send-discord', [EventController::class, 'sendDiscordNotification']);
+Route::get('/test', [EventController::class, 'testEventDispatch']);

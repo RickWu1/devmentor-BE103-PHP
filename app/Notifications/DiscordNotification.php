@@ -1,51 +1,44 @@
 <?php
-
 namespace App\Notifications;
 
+use App\Channels\DiscordChannel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
+
+// 引入 DiscordChannel
 
 class DiscordNotification extends Notification
 {
     use Queueable;
-
-    protected $message;
+    protected $user;
+    protected $event;
 
     /**
-     * Create a new notification instance.
+     * 构造函数.
+     *
+     * @param $user 用户对象
+     * @param $event 事件对象
      */
-    public function __construct($message)
+    public function __construct($user, $event)
     {
-        $this->message = $message;
+        $this->user  = $user;
+        $this->event = $event;
     }
 
-    /**
-     * Get the notification's delivery channels.
-     *
-     *
-     */
-    public function via(object $notifiable)
+    public function via($notifiable)
     {
-        return ['discord'];
+        return [DiscordChannel::class];
     }
 
-    /**
-     * Get the mail representation of the notification.
-     */
-    public function toDiscord(object $notifiable)
+    public function toDiscord($notifiable)
     {
-        return DiscordMessage::create($this->message);
-    }
+        $message = "您好 {$this->user->name}，以下是事件详情：\n"
+            . "事件名称：{$this->event->name}\n"
+            . "触发时间：{$this->event->trigger_time}\n"
+            . "描述：{$this->event->description}";
 
-    /**
-     * Get the array representation of the notification.
-     *
-     * @return array<string, mixed>
-     */
-    public function toArray(object $notifiable): array
-    {
         return [
-            //
+            'content' => $message, // 從資料庫取得訊息
         ];
     }
 }
