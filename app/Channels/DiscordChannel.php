@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Channels;
 
 use Illuminate\Notifications\Notification;
@@ -20,7 +19,7 @@ class DiscordChannel
         $data = $notification->toDiscord($notifiable);
 
         // 從 .env 文件中獲取 Webhook URL
-        $discordWebhookUrl = env('DISCORD_WEBHOOK_URL');
+        $discordWebhookUrl = config('services.discord.webhook');
 
         // 發送 HTTP 請求到 Discord Webhook URL
         Http::post($discordWebhookUrl, $data);

@@ -96,6 +96,12 @@ class EventController extends Controller
         echo $response;
     }
 
+    // public function testqueue(): void
+    // {
+    //     dispatch(new TestJob());
+
+    // }
+
     public function testEventDispatch()
     {
         $events = Event::with([
@@ -132,7 +138,7 @@ class EventController extends Controller
     {
         switch ($channelName) {
             case 'email':
-                $this->testEmail($user->id, $event);
+                $this->testEmail($user->id);
                 break;
 
             case 'line':

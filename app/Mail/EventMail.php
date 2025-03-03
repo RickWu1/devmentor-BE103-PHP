@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
@@ -12,43 +11,44 @@ class EventMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $users;
+    public $user;
     public $eventIds;
+
     /**
-     * Create a new message instance.
+     * 建構函式，接收使用者和事件 ID 陣列
      */
-    public function __construct($users, $eventIds)
+    public function __construct($user, array $eventIds)
     {
-        $this->users = $users;
+        $this->user     = $user;
         $this->eventIds = $eventIds;
     }
 
     /**
-     * Get the message envelope.
+     * 設定郵件標題
      */
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Event Mail',
+            subject: '事件通知'
         );
     }
 
     /**
-     * Get the message content definition.
+     * 設定郵件內容
      */
     public function content(): Content
     {
         return new Content(
             view: 'eventMail',
-            with: ['users' => $this->users,
-                'eventIds' => $this->eventIds]
+            with: [
+                'user'     => $this->user,
+                'eventIds' => $this->eventIds,
+            ]
         );
     }
 
     /**
-     * Get the attachments for the message.
-     *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
+     * 附件（如果有）
      */
     public function attachments(): array
     {
