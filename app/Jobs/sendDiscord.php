@@ -27,16 +27,12 @@ class sendDiscord implements ShouldQueue
     public function handle(): void
     {
 
-        // Log::info('Running sendDiscord job');
-
-        // dd($this->user, $this->event);
-
         Log::info("SendDiscord Job 執行成功，User ID: {$this->user->id}, Event ID: {$this->event->id}");
 
-        $discordWebhookUrl = "https://discordapp.com/api/webhooks/1311613486136164422/26vIg6uKUhVKPh_lOFnehVLLItJckQPLEolJUJFxfPzAV1I-E9bsudmCM2uLkWrJliQy";
+        $discordWebhookUrl = config('services.discord.webhook');
 
         if (! $discordWebhookUrl) {
-            Log::error("❌ Discord Webhook URL 未設定，請檢查 .env 設定");
+            Log::error(" Discord Webhook URL 未設定，請檢查 .env 設定");
             return;
         }
 
@@ -44,9 +40,9 @@ class sendDiscord implements ShouldQueue
             Notification::route(DiscordChannel::class, $discordWebhookUrl)
                 ->notify(new DiscordNotification($this->user, $this->event));
 
-            Log::info("✅ Discord notification sent successfully for user ID: {$this->user->id}");
+            Log::info(" Discord notification sent successfully for user ID: {$this->user->id}");
         } catch (\Exception $e) {
-            Log::error("❌ Failed to send Discord notification: " . $e->getMessage());
+            Log::error(" Failed to send Discord notification: " . $e->getMessage());
         }
     }
 }

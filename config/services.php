@@ -35,6 +35,10 @@ return [
         'token' => env('TELEGRAM_BOT_TOKEN'),
     ],
 
+    'telegram'         => [
+        'chat_id' => env('CHAT_ID'),
+    ],
+
     'discord'          => [
         'webhook' => env('DISCORD_WEBHOOK_URL'),
     ],

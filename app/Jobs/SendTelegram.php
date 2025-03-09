@@ -26,7 +26,7 @@ class SendTelegram implements ShouldQueue
 
     public function handle(): void
     {
-        $chatId = '7748237713'; // 替換成目標 Chat ID
+        $chatId = config('services.telegram.chat_id'); // 替換成目標 Chat ID
 
         try {
             // 發送 Telegram 推播通知

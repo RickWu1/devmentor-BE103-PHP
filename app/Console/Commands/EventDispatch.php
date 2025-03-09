@@ -39,8 +39,7 @@ class EventDispatch extends Command
             $this->processEventNotifications($event);
         }
 
-        $this->info('所有通知已处理完成');
-        Log::info('所有通知已处理完成');
+        $this->info('所有通知已處理完成');
     }
 
     protected function processEventNotifications($event)
@@ -54,7 +53,7 @@ class EventDispatch extends Command
                 try {
                     $this->sendNotification($channelName, $user, $event);
                 } catch (\Exception $e) {
-                    Log::error("通知失败: 事件 ID: {$event->id}, 用户 ID: {$user->id}, 错误信息: " . $e->getMessage());
+                    Log::error("通知失败: 事件 ID: {$event->id}, 用户 ID: {$user->id}, 錯誤信息: " . $e->getMessage());
                 }
             }
         }
@@ -78,15 +77,12 @@ class EventDispatch extends Command
         switch ($channelName) {
             case 'email':
                 Log::info("正在發送 Email 通知，事件 ID: {$event->id}, 用戶 ID: {$user->id}");
-                // $userId = $user->id;
                 SendEmail::dispatch($user, $event);
                 break;
 
             case 'line':
                 Log::info("正在發送 Discord 通知，事件 ID: {$event->id}, 用戶 ID: {$user->id}");
-                // dd($user->id);
                 sendDiscord::dispatch($user, $event);
-
                 break;
 
             case 'telegram':
