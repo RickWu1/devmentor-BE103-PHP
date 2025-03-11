@@ -20,7 +20,7 @@ class SendTelegram implements ShouldQueue
 
     public function __construct($user, $event)
     {
-        $this->user  = $user;
+        $this->user = $user;
         $this->event = $event;
     }
 
@@ -32,7 +32,6 @@ class SendTelegram implements ShouldQueue
             // 發送 Telegram 推播通知
             Notification::route(TelegramChannel::class, $chatId)
                 ->notify(new TelegramNotification($this->user, $this->event));
-
             Log::info("Telegram 推播通知已發送成功，Chat ID: " . $chatId);
         } catch (\Exception $e) {
             Log::error("Telegram 推播通知發送失敗: " . $e->getMessage());

@@ -88,7 +88,6 @@ class EventDispatch extends Command
             case 'telegram':
                 Log::info("正在發送 Telegram 通知，事件 ID: {$event->id}, 用戶 ID: {$user->id}");
                 SendTelegram::dispatch($user, $event);
-
                 break;
 
             default:

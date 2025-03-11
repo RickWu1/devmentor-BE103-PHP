@@ -19,7 +19,7 @@ class EventMail extends Mailable
      */
     public function __construct($user, array $eventIds)
     {
-        $this->user     = $user;
+        $this->user = $user;
         $this->eventIds = $eventIds;
     }
 

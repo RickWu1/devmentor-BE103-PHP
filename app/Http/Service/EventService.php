@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Service;
 
 use App\Http\Repository\EventRepository;
@@ -30,7 +29,7 @@ class EventService
 
     public function delete($id, $input)
     {
-        return $this->eventRepository->delete($id, $input);
+        return $this->eventRepository->delete($id);
     }
 
     public function creatUser(array $input)
@@ -40,7 +39,7 @@ class EventService
 
     public function deleteUser($id, $input)
     {
-        return $this->eventRepository->deleteUser($id, $input);
+        return $this->eventRepository->deleteUser($id);
     }
 
     public function subscribe($id, array $input)
