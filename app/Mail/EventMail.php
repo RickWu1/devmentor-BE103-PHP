@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
@@ -9,7 +10,8 @@ use Illuminate\Queue\SerializesModels;
 
 class EventMail extends Mailable
 {
-    use Queueable, SerializesModels;
+    use Queueable;
+    use SerializesModels;
 
     public $user;
     public $eventIds;
@@ -41,7 +43,7 @@ class EventMail extends Mailable
         return new Content(
             view: 'eventMail',
             with: [
-                'user'     => $this->user,
+                'user' => $this->user,
                 'eventIds' => $this->eventIds,
             ]
         );

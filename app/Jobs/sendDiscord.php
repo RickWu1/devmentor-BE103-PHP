@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Jobs;
 
 use App\Notifications\DiscordNotification;
@@ -13,7 +14,10 @@ use NotificationChannels\Discord\DiscordChannel;
 
 class sendDiscord implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
     protected $user;
     protected $event;
@@ -21,7 +25,7 @@ class sendDiscord implements ShouldQueue
     public function __construct($user, $event)
     {
         $this->user  = $user;
-        $this->event = $event;
+        $this-> event = $event;
     }
 
     public function handle(): void
@@ -32,7 +36,7 @@ class sendDiscord implements ShouldQueue
         $discordWebhookUrl = config('services.discord.webhook');
 
         if (! $discordWebhookUrl) {
-            Log::error(" Discord Webhook URL 未設定，請檢查 .env 設定");
+            Log::error(' Discord Webhook URL 未設定，請檢查 .env 設定');
             return;
         }
 
@@ -42,7 +46,7 @@ class sendDiscord implements ShouldQueue
 
             Log::info(" Discord notification sent successfully for user ID: {$this->user->id}");
         } catch (\Exception $e) {
-            Log::error(" Failed to send Discord notification: " . $e->getMessage());
+            Log::error(' Failed to send Discord notification: ' . $e->getMessage());
         }
     }
 }

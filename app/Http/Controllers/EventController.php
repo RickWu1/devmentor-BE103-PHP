@@ -1,7 +1,7 @@
 <?php
+
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateEventRequest;
 use App\Http\Requests\UpdateEventRequest;
 use App\Http\Service\EventService;
@@ -11,7 +11,6 @@ use Illuminate\Http\Request;
 
 class EventController extends Controller
 {
-
     private $eventService;
 
     public function __construct(EventService $eventService)
