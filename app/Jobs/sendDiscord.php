@@ -24,7 +24,7 @@ class sendDiscord implements ShouldQueue
 
     public function __construct($user, $event)
     {
-        $this->user  = $user;
+        $this->user = $user;
         $this-> event = $event;
     }
 

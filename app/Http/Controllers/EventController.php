@@ -20,7 +20,7 @@ class EventController extends Controller
 
     public function index(GetEventsTransformer $transformer)
     {
-        $events   = Event::with('eventNotifyChannels')->get();
+        $events = Event::with('eventNotifyChannels')->get();
         $response = $transformer->transform($events);
         return response()->json($response);
     }
@@ -37,9 +37,9 @@ class EventController extends Controller
         return response()->json($event);
     }
 
-    public function get($event_id)
+    public function get($eventid)
     {
-        $event = $this->eventService->get($event_id);
+        $event = $this->eventService->get($eventid);
         return response()->json($event);
     }
 
@@ -49,9 +49,9 @@ class EventController extends Controller
         return response()->json($event);
     }
 
-    public function creatUser(Request $request)
+    public function createUser(Request $request)
     {
-        $event = $this->eventService->creatUser($request->all());
+        $event = $this->eventService->createUser($request->all());
         return response()->json($event);
 
     }

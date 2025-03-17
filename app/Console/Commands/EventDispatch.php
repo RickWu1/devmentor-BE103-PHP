@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Console\Commands;
 
 use App\Jobs\sendDiscord;
@@ -53,7 +54,7 @@ class EventDispatch extends Command
                 try {
                     $this->sendNotification($channelName, $user, $event);
                 } catch (\Exception $e) {
-                    Log::error("通知失败: 事件 ID: {$event->id}, 用户 ID: {$user->id}, 錯誤信息: " . $e->getMessage());
+                    Log::error("通知失敗: 事件 ID: {$event->id}, 用户 ID: {$user->id}, 錯誤訊息: " . $e->getMessage());
                 }
             }
         }
@@ -61,32 +62,32 @@ class EventDispatch extends Command
 
     private function sendNotification($channelName, $user, $event)
     {
-        $channelName = trim(strtolower($channelName)); // 確保匹配
+        $channelName = trim(strtolower($channelName)); // 確保配對成功
         Log::info("通知方式: [$channelName]");     // 記錄 Log 來確認
 
         if (! $user) {
-            Log::error("使用者對象為 null，無法發送通知");
+            Log::error('使用者對象為 null，無法發送通知');
             return;
         }
 
         if (! isset($user->id)) {
-            Log::error("使用者對象不包含 ID，可能是 array 而非 Model", ['user' => $user]);
+            Log::error('使用者對象不包含 ID，可能是 array 而非 Model', ['user' => $user]);
             return;
         }
 
         switch ($channelName) {
             case 'email':
-                Log::info("正在發送 Email 通知，事件 ID: {$event->id}, 用戶 ID: {$user->id}");
+                Log::info("正在發送 {$channelName} 通知，事件 ID: {$event->id}, 用戶 ID: {$user->id}");
                 SendEmail::dispatch($user, $event);
                 break;
 
             case 'line':
-                Log::info("正在發送 Discord 通知，事件 ID: {$event->id}, 用戶 ID: {$user->id}");
+                Log::info("正在發送 {$channelName} 通知，事件 ID: {$event->id}, 用戶 ID: {$user->id}");
                 sendDiscord::dispatch($user, $event);
                 break;
 
             case 'telegram':
-                Log::info("正在發送 Telegram 通知，事件 ID: {$event->id}, 用戶 ID: {$user->id}");
+                Log::info("正在發送 {$channelName} 通知，事件 ID: {$event->id}, 用戶 ID: {$user->id}");
                 SendTelegram::dispatch($user, $event);
                 break;
 

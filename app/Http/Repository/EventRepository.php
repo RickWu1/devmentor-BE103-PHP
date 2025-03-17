@@ -32,11 +32,11 @@ class EventRepository
             $event->eventNotifyChannels()->saveMany($eventNotifyChannels);
             DB::commit();
 
-            return response()->json($event);
-        } catch (\Exception $e) {
-            DB::rollBack();
+            return $event;
 
-            return response()->json(['error' => 'An error occurred while updating the event.'], 500);
+        } catch (\Exception $e) {
+
+            DB::rollBack();
         }
     }
 
@@ -74,25 +74,29 @@ class EventRepository
 
             DB::commit();
 
-            return response()->json($updateEvent);
+            return $updateEvent;
 
         } catch (\Exception $e) {
 
             DB::rollBack();
-            return response()->json(['error' => 'An error occurred while updating the event.'], 500);
+
         }
     }
 
     public function get($event_id)
     {
         $event = Event::find($event_id);
+        if (!$event) {
+            return response()->json(['error' => 'Event not found.'], 404);
+        }
         $response = [
             'id' => $event->id,
             'name' => $event->name,
             'trigger_time' => $event->trigger_time,
             'event_notify_channels' => $event->eventNotifyChannels->pluck('notify_channel_id'),
         ];
-        return response()->json($response);
+
+        return $response;
     }
 
     public function delete($id)
@@ -100,10 +104,10 @@ class EventRepository
         $deleteEvent = Event::where('id', $id)->first();
         $deleteEvent->delete();
 
-        return response()->json($deleteEvent);
+        return $deleteEvent;
     }
 
-    public function creatUser(array $input)
+    public function createUser(array $input)
     {
         $userEvent = new User();
         $userEvent->name = $input['name'];
@@ -111,7 +115,7 @@ class EventRepository
         $userEvent->password = $input['password'];
         $userEvent->save();
 
-        return response()->json($userEvent);
+        return $userEvent;
     }
 
     public function deleteUser($id)
@@ -119,7 +123,7 @@ class EventRepository
         $deleteUser = User::where('id', $id)->first();
         $deleteUser->delete();
 
-        return response()->json($deleteUser);
+        return $deleteUser;
 
     }
 
@@ -135,6 +139,7 @@ class EventRepository
         }
 
         $subscribeEvent->UserSubscribeEvents()->saveMany($userSubscribeEvents);
-        return response()->json($userSubscribeEvents);
+
+        return $userSubscribeEvents;
     }
 }

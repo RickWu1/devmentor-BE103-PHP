@@ -17,7 +17,7 @@ class EventMail extends Mailable
     public $eventIds;
 
     /**
-     * 建構函式，接收使用者和事件 ID 陣列
+     * 建立函式，接收使用者和事件 ID 陣列
      */
     public function __construct($user, array $eventIds)
     {

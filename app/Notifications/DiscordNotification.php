@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Notifications;
 
 use App\Channels\DiscordChannel;
@@ -14,14 +15,14 @@ class DiscordNotification extends Notification
     protected $event;
 
     /**
-     * 构造函数.
+     * 建立函數.
      *
-     * @param $user 用户对象
-     * @param $event 事件对象
+     * @param $user 用户變數
+     * @param $event 事件變數
      */
     public function __construct($user, $event)
     {
-        $this->user  = $user;
+        $this->user = $user;
         $this->event = $event;
     }
 
@@ -32,10 +33,10 @@ class DiscordNotification extends Notification
 
     public function toDiscord($notifiable)
     {
-        $message = "您好 {$this->user->name}，以下是事件详情：\n"
-            . "事件名称：{$this->event->name}\n"
-            . "触发时间：{$this->event->trigger_time}\n"
-            . "描述：{$this->event->description}";
+        $message = "您好 {$this->user->name}，以下是事件內容：\n"
+            . "事件名稱：{$this->event->name}\n"
+            . "觸發时间：{$this->event->trigger_time}\n"
+            . "事件描述：{$this->event->description}";
 
         return [
             'content' => $message, // 從資料庫取得訊息

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
@@ -14,10 +15,10 @@ class TelegramNotification extends Notification
     protected $event;
 
     /**
-     * 构造函数.
+     * 建立函数.
      *
-     * @param $user 用户对象
-     * @param $event 事件对象
+     * @param $user 用户變數
+     * @param $event 事件變數
      */
     public function __construct($user, $event)
     {
@@ -26,7 +27,7 @@ class TelegramNotification extends Notification
     }
 
     /**
-     * 指定通知的发送通道.
+     * 指定通知的發送管道.
      */
     public function via(object $notifiable): array
     {
@@ -34,22 +35,19 @@ class TelegramNotification extends Notification
     }
 
     /**
-     * 构建 Telegram 消息.
+     * 建立 Telegram 消息.
      */
     public function toTelegram($notifiable)
     {
-        $message = "您好 {$this->user->name}，以下是事件详情：\n"
-            . "事件名称：{$this->event->name}\n"
-            . "触发时间：{$this->event->trigger_time}\n"
-            . "描述：{$this->event->description}";
+        $message = "您好 {$this->user->name}，以下是事件內容：\n"
+            . "事件名稱：{$this->event->name}\n"
+            . "觸發时间：{$this->event->trigger_time}\n"
+            . "事件描述：{$this->event->description}";
 
         return TelegramMessage::create()
             ->content($message);
     }
 
-    /**
-     * 将通知转为数组表示 (可选).
-     */
     public function toArray(object $notifiable): array
     {
         return [
