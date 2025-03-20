@@ -35,7 +35,7 @@ class SendEmail implements ShouldQueue
         $email = $this->user->email;
 
         try {
-            Mail::to($email)->send(new EventMail($this->user, [$this->event->id]));
+            Mail::to($email)->send(new EventMail($this->user, $this->event->id));
             Log::info('郵件已成功發送給: ' . $email);
         } catch (\Exception $e) {
             Log::error('郵件發送失敗: ' . $e->getMessage());

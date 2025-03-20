@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Jobs;
 
 use App\Notifications\TelegramNotification;
@@ -13,7 +14,10 @@ use NotificationChannels\Telegram\TelegramChannel;
 
 class SendTelegram implements ShouldQueue
 {
-    use Dispatchable, Queueable, InteractsWithQueue, SerializesModels;
+    use Dispatchable;
+    use Queueable;
+    use InteractsWithQueue;
+    use SerializesModels;
 
     protected $user;
     protected $event;
@@ -26,15 +30,14 @@ class SendTelegram implements ShouldQueue
 
     public function handle(): void
     {
-        $chatId = config('services.telegram.chat_id'); // 替換成目標 Chat ID
+        $chatId = config('services.telegram.chat_id');
 
         try {
-            // 發送 Telegram 推播通知
             Notification::route(TelegramChannel::class, $chatId)
                 ->notify(new TelegramNotification($this->user, $this->event));
-            Log::info("Telegram 推播通知已發送成功，Chat ID: " . $chatId);
+            Log::info('Telegram 推播通知已發送成功，Chat ID: ' . $chatId);
         } catch (\Exception $e) {
-            Log::error("Telegram 推播通知發送失敗: " . $e->getMessage());
+            Log::error('Telegram 推播通知發送失敗: ' . $e->getMessage());
         }
     }
 }

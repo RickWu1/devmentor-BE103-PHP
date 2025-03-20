@@ -13,22 +13,17 @@ use Illuminate\Support\Facades\Log;
 class EventDispatch extends Command
 {
     /**
-     * The name and signature of the console command.
      *
      * @var string
      */
     protected $signature = 'event:dispatch {eventType}';
 
     /**
-     * The console command description.
      *
      * @var string
      */
     protected $description = 'Dispatch event notifications based on event type.';
 
-    /**
-     * Execute the console command.
-     */
     public function handle()
     {
         $events = Event::with([
@@ -62,8 +57,12 @@ class EventDispatch extends Command
 
     private function sendNotification($channelName, $user, $event)
     {
-        $channelName = trim(strtolower($channelName)); // 確保配對成功
-        Log::info("通知方式: [$channelName]");     // 記錄 Log 來確認
+        $channelName = trim(strtolower($channelName));
+
+        if (! in_array($channelName, ['email', 'line', 'telegram'])) {
+            Log::error("未知的通知方式: [$channelName]");
+            return;
+        }
 
         if (! $user) {
             Log::error('使用者對象為 null，無法發送通知');
@@ -75,24 +74,19 @@ class EventDispatch extends Command
             return;
         }
 
+        Log::info("正在發送 {$channelName} 通知，事件 ID: {$event->id}, 用戶 ID: {$user->id}");
+
         switch ($channelName) {
             case 'email':
-                Log::info("正在發送 {$channelName} 通知，事件 ID: {$event->id}, 用戶 ID: {$user->id}");
                 SendEmail::dispatch($user, $event);
                 break;
 
             case 'line':
-                Log::info("正在發送 {$channelName} 通知，事件 ID: {$event->id}, 用戶 ID: {$user->id}");
                 sendDiscord::dispatch($user, $event);
                 break;
 
             case 'telegram':
-                Log::info("正在發送 {$channelName} 通知，事件 ID: {$event->id}, 用戶 ID: {$user->id}");
                 SendTelegram::dispatch($user, $event);
-                break;
-
-            default:
-                Log::error("未知的通知方式: [$channelName]");
                 break;
         }
     }

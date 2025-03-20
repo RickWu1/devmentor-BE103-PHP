@@ -15,10 +15,9 @@ class TelegramNotification extends Notification
     protected $event;
 
     /**
-     * 建立函数.
      *
-     * @param $user 用户變數
-     * @param $event 事件變數
+     * @param $user
+     * @param $event
      */
     public function __construct($user, $event)
     {
@@ -26,17 +25,11 @@ class TelegramNotification extends Notification
         $this->event = $event;
     }
 
-    /**
-     * 指定通知的發送管道.
-     */
     public function via(object $notifiable): array
     {
         return [TelegramChannel::class];
     }
 
-    /**
-     * 建立 Telegram 消息.
-     */
     public function toTelegram($notifiable)
     {
         $message = "您好 {$this->user->name}，以下是事件內容：\n"

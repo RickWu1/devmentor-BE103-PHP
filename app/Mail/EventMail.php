@@ -14,20 +14,14 @@ class EventMail extends Mailable
     use SerializesModels;
 
     public $user;
-    public $eventIds;
+    public $eventId;
 
-    /**
-     * 建立函式，接收使用者和事件 ID 陣列
-     */
-    public function __construct($user, array $eventIds)
+    public function __construct($user, $eventId)
     {
         $this->user = $user;
-        $this->eventIds = $eventIds;
+        $this->eventId = $eventId;
     }
 
-    /**
-     * 設定郵件標題
-     */
     public function envelope(): Envelope
     {
         return new Envelope(
@@ -35,23 +29,17 @@ class EventMail extends Mailable
         );
     }
 
-    /**
-     * 設定郵件內容
-     */
     public function content(): Content
     {
         return new Content(
             view: 'eventMail',
             with: [
                 'user' => $this->user,
-                'eventIds' => $this->eventIds,
+                'eventId' => $this->eventId,
             ]
         );
     }
 
-    /**
-     * 附件（如果有）
-     */
     public function attachments(): array
     {
         return [];

@@ -15,10 +15,9 @@ class DiscordNotification extends Notification
     protected $event;
 
     /**
-     * 建立函數.
      *
-     * @param $user 用户變數
-     * @param $event 事件變數
+     * @param $user
+     * @param $event
      */
     public function __construct($user, $event)
     {
@@ -39,7 +38,7 @@ class DiscordNotification extends Notification
             . "事件描述：{$this->event->description}";
 
         return [
-            'content' => $message, // 從資料庫取得訊息
+            'content' => $message,
         ];
     }
 }
