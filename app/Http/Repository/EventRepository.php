@@ -35,7 +35,6 @@ class EventRepository
             return $event;
 
         } catch (\Exception $e) {
-
             DB::rollBack();
         }
     }
@@ -58,7 +57,6 @@ class EventRepository
             $updateEvent->save();
 
             if (isset($input['event_notify_channels'])) {
-
                 $updateEvent->eventNotifyChannels()->delete();
 
                 $eventNotifyChannels = [];
@@ -77,9 +75,7 @@ class EventRepository
             return $updateEvent;
 
         } catch (\Exception $e) {
-
             DB::rollBack();
-
         }
     }
 
@@ -87,8 +83,9 @@ class EventRepository
     {
         $event = Event::find($event_id);
         if (!$event) {
-            return response()->json(['error' => 'Event not found.'], 404);
+            return null;
         }
+
         $response = [
             'id' => $event->id,
             'name' => $event->name,
@@ -124,7 +121,6 @@ class EventRepository
         $deleteUser->delete();
 
         return $deleteUser;
-
     }
 
     public function subscribe($id, array $input)
@@ -143,3 +139,4 @@ class EventRepository
         return $userSubscribeEvents;
     }
 }
+

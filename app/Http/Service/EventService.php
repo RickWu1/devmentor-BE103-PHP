@@ -46,6 +46,6 @@ class EventService
     public function subscribe($id, array $input)
     {
         return $this->eventRepository->subscribe($id, $input);
-
     }
 }
+

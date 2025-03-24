@@ -8,9 +8,11 @@ use App\Http\Service\EventService;
 use App\Http\Transformer\GetEventsTransformer;
 use App\Models\Event;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class EventController extends Controller
 {
+
     private $eventService;
 
     public function __construct(EventService $eventService)
@@ -37,9 +39,9 @@ class EventController extends Controller
         return response()->json($event);
     }
 
-    public function get($eventid)
+    public function get($event_id)
     {
-        $event = $this->eventService->get($eventid);
+        $event = $this->eventService->get($event_id);
         return response()->json($event);
     }
 
@@ -53,7 +55,6 @@ class EventController extends Controller
     {
         $event = $this->eventService->createUser($request->all());
         return response()->json($event);
-
     }
 
     public function deleteUser($id, Request $request)
@@ -67,5 +68,5 @@ class EventController extends Controller
         $event = $this->eventService->subscribe($id, $request->all());
         return response()->json($event);
     }
-
 }
+
